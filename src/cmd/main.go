@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/jhrick/confirmation-code/internal/cache"
 	"github.com/jhrick/confirmation-code/internal/handlers"
 	"github.com/jhrick/confirmation-code/internal/mail"
 	"github.com/jhrick/confirmation-code/internal/services"
@@ -20,6 +21,7 @@ func main() {
     Router: http.NewServeMux(),
     MailService: mail.Init("", env.MailUsername, env.MailPassword, env.MailHost, env.MailPort),
     CodeService: services.NewCodeService(),
+    CacheManager: cache.Init(),
   }
 
   handler.BindRoutes()

@@ -25,12 +25,12 @@ func (h *Handlers) handleSendMail(w http.ResponseWriter, r *http.Request) {
   }
 
   mailSubject := "Your code"
-  mailBody := h.CodeService.GenerateCode()
+  code := h.CodeService.GenerateCode()
 
   msg := []byte("To:" + body.Email + "\r\n" +
 		"Subject:" + mailSubject + "\r\n" +
 		"\r\n" +
-		mailBody + "\r\n")
+		code + "\r\n")
 
   err := h.MailService.Send([]string{body.Email}, msg)
   if err != nil {
@@ -38,6 +38,8 @@ func (h *Handlers) handleSendMail(w http.ResponseWriter, r *http.Request) {
     http.Error(w, "internal server error", http.StatusInternalServerError)
     return
   }
+
+  h.CacheManager.Store(code)
 
   w.WriteHeader(http.StatusCreated)
   fmt.Fprintln(w, "send")
