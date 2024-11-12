@@ -11,4 +11,5 @@ func (h *Handlers) BindRoutes() {
   })
 
   h.Router.HandleFunc("/smtp", h.handleSendMail)
+  h.Router.HandleFunc("/code", h.handleCheckCode)
 }
