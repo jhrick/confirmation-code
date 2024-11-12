@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
+
+	jsonutils "github.com/jhrick/confirmation-code/internal/utils/json"
 )
 
 func (h *Handlers) handleSendMail(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +20,10 @@ func (h *Handlers) handleSendMail(w http.ResponseWriter, r *http.Request) {
   var body _body
 
   if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-    http.Error(w, "invalid json", http.StatusBadRequest)
+    jsonutils.WriteJSON(w, http.StatusBadRequest, map[string]any{
+      "success": false,
+      "error": "invalid request body",
+    })
     return
   }
 
@@ -34,13 +37,16 @@ func (h *Handlers) handleSendMail(w http.ResponseWriter, r *http.Request) {
 
   err := h.MailService.Send([]string{body.Email}, msg)
   if err != nil {
-    log.Println(err)
-    http.Error(w, "internal server error", http.StatusInternalServerError)
+    jsonutils.WriteJSON(w, http.StatusInternalServerError, map[string]any{
+      "success": false,
+      "error": "internal server error",
+    })
     return
   }
 
   h.CacheManager.Store(code)
 
-  w.WriteHeader(http.StatusCreated)
-  fmt.Fprintln(w, "send")
+  jsonutils.WriteJSON(w, http.StatusCreated, map[string]any{
+    "message": "send",
+  })
 }

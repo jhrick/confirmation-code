@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
+
 	"github.com/jhrick/confirmation-code/internal/cache"
+	jsonutils "github.com/jhrick/confirmation-code/internal/utils/json"
 )
 
 func (h *Handlers) handleCheckCode(w http.ResponseWriter, r *http.Request) {
@@ -35,10 +36,14 @@ func (h *Handlers) handleCheckCode(w http.ResponseWriter, r *http.Request) {
         codeStatus = "expired"
     }
 
-      http.Error(w, codeStatus + " code", http.StatusBadRequest)
+      jsonutils.WriteJSON(w, http.StatusBadRequest, map[string]any{
+        "success": false,
+        "error": codeStatus + " code",
+      })
       return
   }
 
-  w.WriteHeader(http.StatusOK)
-  fmt.Fprintln(w, "success")
+  jsonutils.WriteJSON(w, http.StatusOK, map[string]any{
+    "success": true,
+  })
 }
