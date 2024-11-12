@@ -6,17 +6,23 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+
+	"github.com/jhrick/confirmation-code/internal/handlers"
+	"github.com/jhrick/confirmation-code/internal/mail"
+	"github.com/jhrick/confirmation-code/internal/utils/env"
 )
 
 func main() {
-  mux := http.NewServeMux()
+  env.LoadEnv()
 
-  mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprint(w, "pong\n")
-  })
+  handler := handlers.Handlers{
+    Router: http.NewServeMux(),
+  }
+
+  handler.BindRoutes()
 
   go func() {
-    err := http.ListenAndServe(":8080", mux)
+    err := http.ListenAndServe(":8080", handler.Router)
 
     if err != nil {
       if !errors.Is(err, http.ErrServerClosed) {
