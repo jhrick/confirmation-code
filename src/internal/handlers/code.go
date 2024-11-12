@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/jhrick/confirmation-code/internal/cache"
 )
 
 func (h *Handlers) handleCheckCode(w http.ResponseWriter, r *http.Request) {
@@ -23,10 +25,18 @@ func (h *Handlers) handleCheckCode(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  correct := h.CacheManager.Check(body.Code)
-  if !correct {
-    http.Error(w, "incorrect code", http.StatusBadRequest)
-    return
+  signal := h.CacheManager.Check(body.Code)
+  if signal != cache.Ok {
+    var codeStatus string
+    switch signal {
+      case cache.NotFound:
+        codeStatus = "incorrect"
+      case cache.Expired:
+        codeStatus = "expired"
+    }
+
+      http.Error(w, codeStatus + " code", http.StatusBadRequest)
+      return
   }
 
   w.WriteHeader(http.StatusOK)
