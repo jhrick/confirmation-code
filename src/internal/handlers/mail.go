@@ -24,8 +24,8 @@ func (h *Handlers) handleSendMail(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  mailSubject := "Your mail"
-  mailBody := "Mail Body"
+  mailSubject := "Your code"
+  mailBody := h.CodeService.GenerateCode()
 
   msg := []byte("To:" + body.Email + "\r\n" +
 		"Subject:" + mailSubject + "\r\n" +

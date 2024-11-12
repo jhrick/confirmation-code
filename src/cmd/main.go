@@ -9,6 +9,7 @@ import (
 
 	"github.com/jhrick/confirmation-code/internal/handlers"
 	"github.com/jhrick/confirmation-code/internal/mail"
+	"github.com/jhrick/confirmation-code/internal/services"
 	"github.com/jhrick/confirmation-code/internal/utils/env"
 )
 
@@ -18,6 +19,7 @@ func main() {
   handler := handlers.Handlers{
     Router: http.NewServeMux(),
     MailService: mail.Init("", env.MailUsername, env.MailPassword, env.MailHost, env.MailPort),
+    CodeService: services.NewCodeService(),
   }
 
   handler.BindRoutes()
