@@ -17,6 +17,7 @@ func main() {
 
   handler := handlers.Handlers{
     Router: http.NewServeMux(),
+    MailService: mail.Init("", env.MailUsername, env.MailPassword, env.MailHost, env.MailPort),
   }
 
   handler.BindRoutes()
